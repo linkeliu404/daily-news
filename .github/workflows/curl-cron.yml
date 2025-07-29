@@ -1,0 +1,14 @@
+name: Scheduled cURL
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+jobs:
+  curl_job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: cURL request
+        run: |
+          curl -sS https://daily-news-ig0a7unzy-linkeliu404s-projects.vercel.app/api/news
