@@ -1,6 +1,3 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { Megaphone, Rocket } from "lucide-react";
 import Link from "next/link";
 
 export type Announcement = {
@@ -18,34 +15,48 @@ export default function AnnouncementCard({
 }: {
   announcement: Announcement;
 }) {
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    const hours = date.getHours().toString().padStart(2, "0");
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+    return `${year}-${month}-${day} ${hours}:${minutes}`;
+  };
+
   return (
-    <Card className="w-full max-w-2xl mx-auto mb-4 shadow-sm">
-      <CardContent className="flex flex-col gap-2 p-4">
-        <div className="flex items-center gap-2 text-muted-foreground text-xs">
-          <Megaphone className="w-4 h-4" />
-          <span>{new Date(announcement.publishedAt).toLocaleString()}</span>
-        </div>
-        <Link
+    <div className="w-full">
+      <div className="p-2 sm:p-4 hover:ascii-glow transition-all duration-300">
+        <a
           href={announcement.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-base font-semibold hover:underline"
+          className="block"
         >
-          {announcement.title}
-        </Link>
-        {announcement.summary && (
-          <div className="text-sm text-muted-foreground line-clamp-2">
-            {announcement.summary}
+          <div className="text-green-400 hover:text-green-300 transition-colors">
+            <div className="text-green-300 text-xs mb-1">
+              {formatDate(announcement.publishedAt)}
+            </div>
+            <div className="mb-2">
+              <span className="hover:underline cursor-pointer text-sm sm:text-base">
+                {announcement.title}
+              </span>
+            </div>
+
+            {announcement.summary && (
+              <div className="text-green-300 text-xs sm:text-sm mt-2">
+                <span className="text-green-500">└─</span>{" "}
+                {announcement.summary}
+              </div>
+            )}
+
+            <div className="text-green-500 text-xs mt-2">
+              └─ Click to read more...
+            </div>
           </div>
-        )}
-        {announcement.coverImage && (
-          <img
-            src={announcement.coverImage}
-            alt="cover"
-            className="rounded mt-2 max-h-40 object-cover"
-          />
-        )}
-      </CardContent>
-    </Card>
+        </a>
+      </div>
+    </div>
   );
 }
