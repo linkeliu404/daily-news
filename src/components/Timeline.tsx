@@ -11,9 +11,13 @@ export default function Timeline() {
   const [displayCount, setDisplayCount] = useState(10);
   const [loadingProgress, setLoadingProgress] = useState(0);
 
+  // 新增：用于打字机效果的已显示条数
+  const [typedCount, setTypedCount] = useState(0);
+
   async function fetchNews() {
     setLoading(true);
     setLoadingProgress(0);
+    setTypedCount(0); // 每次刷新时重置打字机进度
 
     // Simulate loading progress
     const progressInterval = setInterval(() => {
@@ -42,10 +46,26 @@ export default function Timeline() {
 
   const handleLoadMore = () => {
     setDisplayCount((prev) => prev + 10);
+    // 允许打字机继续显示更多
+    setTypedCount((prev) => Math.min(prev + 10, announcements?.length || 0));
   };
 
   const displayedAnnouncements = announcements?.slice(0, displayCount) || [];
   const hasMore = announcements && announcements.length > displayCount;
+
+  // 打字机效果：每隔一定时间显示一条新闻
+  useEffect(() => {
+    if (!announcements || loading) return;
+    setTypedCount(0);
+    if (displayedAnnouncements.length === 0) return;
+    let i = 0;
+    const interval = setInterval(() => {
+      i++;
+      setTypedCount(i);
+      if (i >= displayedAnnouncements.length) clearInterval(interval);
+    }, 180); // 每条新闻出现的间隔
+    return () => clearInterval(interval);
+  }, [announcements, displayCount, loading]);
 
   return (
     <div className="w-full">
@@ -76,7 +96,8 @@ export default function Timeline() {
               </div>
             )}
 
-            {displayedAnnouncements.map((a, i) => (
+            {/* 打字机效果：只渲染 typedCount 条新闻 */}
+            {displayedAnnouncements.slice(0, typedCount).map((a, i) => (
               <div key={a.id} className="flex items-start group">
                 <div className="flex-1 ml-8 sm:ml-8">
                   <AnnouncementCard announcement={a} />
